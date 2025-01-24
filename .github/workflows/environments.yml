@@ -3,33 +3,34 @@ name: Validate Environment
 on:
   workflow_dispatch:
 
-validate-environments:
-  name: Check Environments
-  runs-on: ubuntu-latest
-  strategy:
-    matrix:
-      environment: [test]
-  steps:
-    - name: Validate environment exists and has required reviewers
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-        ENVIRONMENT_NAME: ${{ matrix.environment }}
-      run: |
-        echo "Validating environment: ${ENVIRONMENT_NAME}"
-        # Query the environment via REST API
-        response=$(curl -sSL \
-          -H "Authorization: Bearer $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/${REPO}/environments/${ENVIRONMENT_NAME}" \
-        )
-        
-        echo $response
-        
-        # 1) Check if the environment is not found
-        if echo "$response" | grep -q '"message": "Not Found"'; then
-          echo "ERROR: Environment '${ENVIRONMENT_NAME}' does not exist in repo '${REPO}'."
-          echo "Please set up the environment and required reviewers *before* attempting to deploy."
-          exit 1
-        fi
-        
-        echo "SUCCESS: Environment '${ENVIRONMENT_NAME}' exists and has required reviewers configured."
+jobs:
+  validate-environments:
+    name: Check Environments
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [test]
+    steps:
+      - name: Validate environment exists and has required reviewers
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ENVIRONMENT_NAME: ${{ matrix.environment }}
+        run: |
+          echo "Validating environment: ${ENVIRONMENT_NAME}"
+          # Query the environment via REST API
+          response=$(curl -sSL \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${REPO}/environments/${ENVIRONMENT_NAME}" \
+          )
+          
+          echo $response
+          
+          # 1) Check if the environment is not found
+          if echo "$response" | grep -q '"message": "Not Found"'; then
+            echo "ERROR: Environment '${ENVIRONMENT_NAME}' does not exist in repo '${REPO}'."
+            echo "Please set up the environment and required reviewers *before* attempting to deploy."
+            exit 1
+          fi
+          
+          echo "SUCCESS: Environment '${ENVIRONMENT_NAME}' exists and has required reviewers configured."
