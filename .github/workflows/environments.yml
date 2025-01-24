@@ -21,17 +21,17 @@ jobs:
           response=$(curl -sSL \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
+#            -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/skruijt-foreflight/github-actions-sandbox/environments" \
           )
       
           echo $response
-#
-#          # 1) Check if the environment is not found
-#          if echo "$response" | grep -q '"message": "Not Found"'; then
-#            echo "ERROR: Environment '${ENVIRONMENT_NAME}' does not exist in repo '${REPO}'."
-#            echo "Please set up the environment and required reviewers *before* attempting to deploy."
-#            exit 1
-#          fi
-#
-#          echo "SUCCESS: Environment '${ENVIRONMENT_NAME}' exists and has required reviewers configured."
+
+          # 1) Check if the environment is not found
+          if echo "$response" | grep -q '"message": "Not Found"'; then
+            echo "ERROR: Environment '${ENVIRONMENT_NAME}' does not exist in repo '${REPO}'."
+            echo "Please set up the environment and required reviewers *before* attempting to deploy."
+            exit 1
+          fi
+
+          echo "SUCCESS: Environment '${ENVIRONMENT_NAME}' exists and has required reviewers configured."
