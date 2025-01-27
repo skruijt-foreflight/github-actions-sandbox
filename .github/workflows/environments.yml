@@ -15,7 +15,7 @@ jobs:
       - name: Validate environment exists and has required reviewers
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          ENVIRONMENT_NAME: ${{ matrix.environment }}
+          ENVIRONMENT: ${{ matrix.environment }}
         run: |
           echo "Validating environment: ${ENVIRONMENT_NAME}"
           # Query the environment via REST API
@@ -27,16 +27,26 @@ jobs:
       
           echo $response
 
-          # Use jq to scan the 'environments' array for an entry with .name == ${ENVIRONMENT_NAME}
-          found_name=$(echo "$response" | jq -r --arg env "${ENVIRONMENT_NAME}" '
+          # Use jq to scan the 'environments' array for an entry with .name == ${ENVIRONMENT}
+          found_name=$(echo "$response" | jq -r --arg env "${ENVIRONMENT}" '
           .environments[]?
           | select(.name == $env)
           | .name
           ')
           
           if [ -z "$found_name" ]; then
-            echo "ERROR: Environment '${ENVIRONMENT_NAME}' was not found in the environments array."
+            echo "ERROR: Environment '${ENVIRONMENT}' was not found in the environments array."
             exit 1
           else
-            echo "SUCCESS: Found environment '$found_name' in the environments array."
+            echo "SUCCESS: Found environment named '${ENVIRONMENT}'. Checking protection rules..."
           fi
+
+          # 2) Check if there's at least one rule with "type": "required_reviewers"
+            required_reviewers_count=$(echo "$found_env" | jq '[.protection_rules[] | select(.type == "required_reviewers")] | length')
+            
+          if [ "$required_reviewers_count" -eq 0 ]; then
+            echo "ERROR: Environment '$TARGET_ENV' has no 'required_reviewers' rule."
+            exit 1
+          fi
+          
+          echo "SUCCESS: Environment '$TARGET_ENV' has a required reviewers rule."
