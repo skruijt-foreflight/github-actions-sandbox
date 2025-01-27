@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [test]
+        environment: [test, dev]
     steps:
       - name: Validate environment exists and has required reviewers
         env:
