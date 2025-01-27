@@ -42,11 +42,11 @@ jobs:
           fi
 
           # 2) Check if there's at least one rule with "type": "required_reviewers"
-            required_reviewers_count=$(echo "$found_env" | jq '[.protection_rules[] | select(.type == "required_reviewers")] | length')
+          required_reviewers_count=$(echo "$found_env" | jq '[.protection_rules[] | select(.type == "required_reviewers")] | length')
             
           if [ "$required_reviewers_count" -eq 0 ]; then
-            echo "ERROR: Environment '$TARGET_ENV' has no 'required_reviewers' rule."
+            echo "ERROR: Environment '$ENVIRONMENT' has no 'required_reviewers' rule."
             exit 1
           fi
           
-          echo "SUCCESS: Environment '$TARGET_ENV' has a required reviewers rule."
+          echo "SUCCESS: Environment '$ENVIRONMENT' has a required reviewers rule."
