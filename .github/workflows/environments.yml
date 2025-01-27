@@ -35,7 +35,7 @@ jobs:
           ')
           
           if [ -z "$found_name" ]; then
-            echo "ERROR: Environment '$TARGET_ENV' was not found in the environments array."
+            echo "ERROR: Environment '${ENVIRONMENT_NAME}' was not found in the environments array."
             exit 1
           else
             echo "SUCCESS: Found environment '$found_name' in the environments array."
