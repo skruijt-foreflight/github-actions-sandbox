@@ -27,11 +27,16 @@ jobs:
       
           echo $response
 
-          # 1) Check if the environment is not found
-          if echo "$response" | grep -q '"message": "Not Found"'; then
-            echo "ERROR: Environment '${ENVIRONMENT_NAME}' does not exist in repo '${REPO}'."
-            echo "Please set up the environment and required reviewers *before* attempting to deploy."
+          # Use jq to scan the 'environments' array for an entry with .name == ${ENVIRONMENT_NAME}
+          found_name=$(echo "$response" | jq -r --arg env "${ENVIRONMENT_NAME}" '
+          .environments[]?
+          | select(.name == $env)
+          | .name
+          ')
+          
+          if [ -z "$found_name" ]; then
+            echo "ERROR: Environment '$TARGET_ENV' was not found in the environments array."
             exit 1
+          else
+            echo "SUCCESS: Found environment '$found_name' in the environments array."
           fi
-
-          echo "SUCCESS: Environment '${ENVIRONMENT_NAME}' exists and has required reviewers configured."
