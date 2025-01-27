@@ -2,6 +2,7 @@ name: Validate Environment
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   validate-environments:
