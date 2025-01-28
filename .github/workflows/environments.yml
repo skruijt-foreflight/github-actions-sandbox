@@ -27,7 +27,7 @@ jobs:
       
           echo $response
 
-          # Use jq to scan the 'environments' array for an entry with .name == ${ENVIRONMENT}
+          # Use jq to scan the api response for an entry with .name == ${ENVIRONMENT}
           found_name=$(echo "$response" | jq -r --arg env "${ENVIRONMENT}" '
           .environments[]?
           | select(.name == $env)
@@ -37,9 +37,9 @@ jobs:
           if [ -z "$found_name" ]; then
             echo "ERROR: Environment '${ENVIRONMENT}' was not found in the environments array."
             exit 1
-          else
-            echo "SUCCESS: Found environment named '${ENVIRONMENT}'. Checking protection rules..."
           fi
+          
+          echo "SUCCESS: Found environment named '${ENVIRONMENT}'. Checking protection rule for required reviewers..."
 
           # 2) Check if there's at least one rule with "type": "required_reviewers"
           found_protection_rule=$(echo "$response" | jq -r --arg env "${ENVIRONMENT}" '.environments[]? | select(.name == $env) | .protection_rules[] | select(.type == "required_reviewers") ')
